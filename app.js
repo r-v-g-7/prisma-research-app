@@ -1,5 +1,6 @@
 const express = require("express")
 const { PORT_NUMBER } = require("./utils/constants");
+require("dotenv").config();
 
 const app = express();
 
