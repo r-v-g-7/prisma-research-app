@@ -7,11 +7,8 @@ healthRouter.get("/health", (req, res, next) => {
         "hey": "greeting",
         "sir": "salutation"
     }
-    try {
-        res.send(jsonData);
-    } catch (err) {
-        console.error("ERROR: " + err);
-    }
+    res.send(jsonData);
 });
+
 
 module.exports = healthRouter; 
