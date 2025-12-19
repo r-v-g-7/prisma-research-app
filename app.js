@@ -5,12 +5,14 @@ const { PORT_NUMBER } = require("./config.js")
 const connectDB = require("./config/database.js")
 
 const healthRouter = require("./routes/healthCheckRouter.js")
+const authRouter = require("./routes/auth.routes.js")
 
 const app = express();
 
 
 app.use(express.json());
-app.use("/", healthRouter)
+app.use("/", healthRouter);
+app.use("/auth", authRouter);
 
 
 async function connectAndListen() {
