@@ -10,3 +10,5 @@ TASKS PERFORMED::::
 - Put .env file in .gitignore
 - Set up database and connect it server
 - apply all the logs and checks to know anytime whether the db is working fine or not
+- Write the password hashing code at the model/schema using pre(`save`) hook
+-
