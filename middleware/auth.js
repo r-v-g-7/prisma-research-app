@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const sendResponse = require("../utils/response");
 
-const isTokenValid = (req, res) => {
+const isTokenValid = (req, res, next) => {
     const { token } = req.cookies;
     try {
         if (!token) {

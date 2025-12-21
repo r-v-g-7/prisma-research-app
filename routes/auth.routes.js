@@ -35,5 +35,7 @@ authRouter.post("/login", async (req, res, next) => {
     }
 });
 
-authRouter.post("/me", isTokenValid)
+authRouter.post("/me", isTokenValid, (req, res, next) => {
+    res.send("Yes the token is valid")
+})
 module.exports = authRouter;
