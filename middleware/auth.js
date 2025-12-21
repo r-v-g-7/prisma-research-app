@@ -8,14 +8,13 @@ const isTokenValid = (req, res, next) => {
             sendResponse(res, 401, false, "Token not found")
             return
         }
-
         const decoded = jwt.verify(token, process.env.JWT_KEY)
-        console.log(decoded);
-
+        const { userId } = decoded;
+        req.userId = userId;
         next();
 
     } catch (err) {
-        throw err
+        sendResponse(res, 400, false, "User Not Verified")
     }
 
 };
