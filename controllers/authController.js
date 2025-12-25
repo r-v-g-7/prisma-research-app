@@ -23,6 +23,7 @@ const loginAuth = async ({ email, password }) => {
         if (!isPasswordValid) {
             throw new Error("Invalid password or Email");
         }
+
         return user
 
     } catch (err) {
@@ -30,6 +31,5 @@ const loginAuth = async ({ email, password }) => {
         throw err;
     }
 }
-
 
 module.exports = { signUpAuth, loginAuth }  

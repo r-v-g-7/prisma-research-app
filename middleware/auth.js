@@ -19,4 +19,8 @@ const isTokenValid = (req, res, next) => {
 
 };
 
+const isRoleValid = (req, res, next) => {
+    const token = req.cookies;
+}
+
 module.exports = isTokenValid;

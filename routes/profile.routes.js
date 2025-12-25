@@ -27,7 +27,6 @@ profileRouter.patch("/update", isTokenValid, async (req, res, next) => {
         const allowedFields = ["name", "fieldOfStudy", "institution"];
         const toUpdateObject = req.body;
         const toUpdateKeys = Object.keys(toUpdateObject);
-        console.log(toUpdateKeys);
 
         const isValidToUpdate = toUpdateKeys.every((key) =>
             allowedFields.includes(key)
