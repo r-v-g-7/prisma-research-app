@@ -10,7 +10,7 @@ const signUpAuth = async ({ name, email, password, role, fieldOfStudy, instituti
         console.error("Something went wrong in signing up the user");
         throw err;
     }
-}
+};
 
 const loginAuth = async ({ email, password }) => {
     try {
