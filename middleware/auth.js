@@ -21,14 +21,15 @@ const isTokenValid = (req, res, next) => {
 };
 
 function isRoleValid(allowedRole) {
+    const roles = Array.isArray(allowedRole) ? allowedRole : [allowedRole]
     return (req, res, next) => {
         if (!req.role) {
-            sendResponse(res, 401, false, "Unautharized Access");
-            return
+            return sendResponse(res, 401, false, "Unautharized Access");
         }
-        if (req.role === allowedRole) {
-            next();
-        } else {
+        if (roles.includes(req.role)) {
+            return next()
+        }
+        else {
             sendResponse(res, 403, false, "Access Denied");
         }
     }
