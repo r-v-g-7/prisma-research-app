@@ -1,5 +1,5 @@
 const express = require("express")
-const isTokenValid = require("../middleware/auth");
+const { isTokenValid } = require("../middleware/auth");
 const useFindUserByUserId = require("../utils/useFindUserWithUserId");
 const sendResponse = require("../utils/response");
 const User = require("../models/user");

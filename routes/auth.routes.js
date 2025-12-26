@@ -2,7 +2,7 @@ const express = require("express")
 const { signUpAuth, loginAuth } = require("../controllers/authController")
 const jwt = require("jsonwebtoken")
 const sendResponse = require("../utils/response")
-const isTokenValid = require("../middleware/auth.js")
+const { isTokenValid } = require("../middleware/auth.js")
 
 const authRouter = express.Router();
 
