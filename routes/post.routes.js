@@ -25,4 +25,17 @@ postRouter.post("/create", isTokenValid, async (req, res, next) => {
 });
 
 
+postRouter.get("/feed", async (req, res, next) => {
+
+    try {
+        const posts = await Post.find({})
+            .populate("author", "name role fieldOfStudy institution")
+            .sort({ createdAt: -1 })
+
+        return sendResponse(res, 200, true, "Post loaded Successfully", posts);
+    } catch (err) {
+        return sendResponse(res, 500, false, "Failed to load feed");
+    }
+});
+
 module.exports = postRouter; 
