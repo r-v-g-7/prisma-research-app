@@ -7,6 +7,7 @@ const cookieParser = require("cookie-parser")
 const healthRouter = require("./routes/healthCheckRouter.js")
 const authRouter = require("./routes/auth.routes.js")
 const profileRouter = require("./routes/profile.routes.js")
+const postRouter = require("./routes/post.routes.js");
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(cookieParser());
 app.use("/", healthRouter);
 app.use("/auth", authRouter);
 app.use("/profile", profileRouter);
+app.use("/post", postRouter);
 
 
 async function connectAndListen() {
