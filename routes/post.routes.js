@@ -2,7 +2,7 @@ const express = require("express");
 const { isTokenValid } = require("../middleware/auth");
 const { Post } = require("../models/post");
 const sendResponse = require("../utils/response");
-const User = require("../models/user");
+const mongoose = require("mongoose");
 
 
 const postRouter = express.Router();
@@ -59,6 +59,38 @@ postRouter.get("/:postId", async (req, res, next) => {
     }
 });
 
+
+
+postRouter.patch("/update/:postId", isTokenValid, async (req, res, next) => {
+
+    try {
+        const allowedFields = ["title", "content", "tags"];
+        const updateKeys = Object.keys(req.body);
+        const isValidToUpdate = updateKeys.every((key) =>
+            allowedFields.includes(key)
+        );
+        if (!isValidToUpdate) {
+            return sendResponse(res, 400, false, "Failed to update respective values");
+        }
+        const postId = req.params.postId;
+        const { title, content, tags } = req.body;
+        if (!title && !content && !tags) {
+            return sendResponse(res, 400, false, "No changes made");
+        }
+
+        const userId = req.userId;
+        const author = userId;
+
+        const post = await Post.findOneAndUpdate({ _id: mongoose.Types.ObjectId(postId), author: author }, req.body, { new: true });
+        if (!post) {
+            return sendResponse(res, 404, false, "Post Does NOT exist");
+        }
+        return sendResponse(res, 200, true, "Post Updated Succesfully");
+
+    } catch (err) {
+        return sendResponse(res, 400, false, "Failed to update the post");
+    }
+});
 
 
 
