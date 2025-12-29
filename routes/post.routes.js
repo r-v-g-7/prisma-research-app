@@ -25,6 +25,9 @@ postRouter.post("/create", isTokenValid, async (req, res, next) => {
 });
 
 
+
+
+
 postRouter.get("/feed", async (req, res, next) => {
 
     try {
@@ -32,10 +35,31 @@ postRouter.get("/feed", async (req, res, next) => {
             .populate("author", "name role fieldOfStudy institution")
             .sort({ createdAt: -1 })
 
-        return sendResponse(res, 200, true, "Post loaded Successfully", posts);
+        return sendResponse(res, 200, true, "Feed loaded Successfully", posts);
     } catch (err) {
         return sendResponse(res, 500, false, "Failed to load feed");
     }
 });
+
+
+
+
+postRouter.get("/:postId", async (req, res, next) => {
+
+    try {
+        const postId = req.params.postId;
+        const post = await Post.findById(postId).populate("author", "name role fieldOfStudy institution");
+        if (!post) {
+            return sendResponse(res, 404, false, "No post exists");
+        }
+        return sendResponse(res, 200, true, "Post Loaded Succesfully", post);
+
+    } catch (err) {
+        return sendRespose(res, 500, false, "Failed to load the post");
+    }
+});
+
+
+
 
 module.exports = postRouter; 
