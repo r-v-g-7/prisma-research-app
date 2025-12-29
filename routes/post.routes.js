@@ -20,7 +20,7 @@ postRouter.post("/create", isTokenValid, async (req, res, next) => {
         sendResponse(res, 201, true, "Posted Succesfully", post);
 
     } catch (err) {
-        sendResponse(res, 400, false, "Post failed")
+        sendResponse(res, 500, false, "Post failed")
     }
 });
 
@@ -48,6 +48,9 @@ postRouter.get("/:postId", async (req, res, next) => {
 
     try {
         const postId = req.params.postId;
+        if (!mongoose.Types.ObjectId.isValid(postId)) {
+            return sendResponse(res, 400, false, "Invalid post ID");
+        }
         const post = await Post.findById(postId).populate("author", "name role fieldOfStudy institution");
         if (!post) {
             return sendResponse(res, 404, false, "No post exists");
@@ -88,7 +91,27 @@ postRouter.patch("/update/:postId", isTokenValid, async (req, res, next) => {
         return sendResponse(res, 200, true, "Post Updated Succesfully");
 
     } catch (err) {
-        return sendResponse(res, 400, false, "Failed to update the post");
+        return sendResponse(res, 500, false, "Failed to update the post");
+    }
+});
+
+
+
+postRouter.delete("/delete/:postId", isTokenValid, async (req, res, next) => {
+
+    try {
+        const postId = req.params.postId;
+        if (!mongoose.Types.ObjectId.isValid(postId)) {
+            return sendResponse(res, 400, false, "Invalid post ID");
+        }
+        const author = req.userId
+        const post = await Post.findOneAndDelete({ author: author, _id: postId });
+        if (!post) {
+            return sendResponse(res, 404, false, "Post not found or you are not authorized");
+        }
+        return sendResponse(res, 200, true, "Post Deleted Successfully");
+    } catch (err) {
+        return sendResponse(res, 500, false, "Failed to delete post");
     }
 });
 
