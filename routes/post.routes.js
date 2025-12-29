@@ -55,7 +55,7 @@ postRouter.get("/:postId", async (req, res, next) => {
         return sendResponse(res, 200, true, "Post Loaded Succesfully", post);
 
     } catch (err) {
-        return sendRespose(res, 500, false, "Failed to load the post");
+        return sendResponse(res, 500, false, "Failed to load the post");
     }
 });
 
