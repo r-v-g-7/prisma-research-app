@@ -4,9 +4,9 @@ const sendResponse = require("../utils/response");
 const Comment = require("../models/comment");
 const { Post } = require("../models/post");
 
-const commentRouter = express.Router();
+const commentRouter = express.Router({ mergeParams: true });
 
-commentRouter.post("/create/:postId", isTokenValid, async (req, res) => {
+commentRouter.post("/create", isTokenValid, async (req, res) => {
 
     try {
         const postId = req.params.postId;
@@ -33,7 +33,7 @@ commentRouter.post("/create/:postId", isTokenValid, async (req, res) => {
 });
 
 
-commentRouter.get("/view/:postId", isTokenValid, async (req, res) => {
+commentRouter.get("/view", isTokenValid, async (req, res) => {
 
     try {
         const postId = req.params.postId;

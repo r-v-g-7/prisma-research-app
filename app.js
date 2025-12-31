@@ -8,7 +8,6 @@ const healthRouter = require("./routes/healthCheckRouter.js")
 const authRouter = require("./routes/auth.routes.js")
 const profileRouter = require("./routes/profile.routes.js")
 const postRouter = require("./routes/post.routes.js");
-const { commentRouter } = require("./routes/comment.routes.js");
 
 const app = express();
 
@@ -20,7 +19,6 @@ app.use("/", healthRouter);
 app.use("/auth", authRouter);
 app.use("/profile", profileRouter);
 app.use("/post", postRouter);
-app.use("/comment", commentRouter);
 
 
 async function connectAndListen() {

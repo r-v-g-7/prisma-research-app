@@ -3,6 +3,7 @@ const { isTokenValid } = require("../middleware/auth");
 const { Post } = require("../models/post");
 const sendResponse = require("../utils/response");
 const mongoose = require("mongoose");
+const { commentRouter } = require("./comment.routes");
 
 
 const postRouter = express.Router();
@@ -105,5 +106,7 @@ postRouter.delete("/delete/:postId", isTokenValid, async (req, res, next) => {
     }
 });
 
+
+postRouter.use("/:postId/comment", commentRouter);
 
 module.exports = postRouter; 
