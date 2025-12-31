@@ -2,7 +2,6 @@ const express = require("express");
 const { isTokenValid } = require("../middleware/auth");
 const sendResponse = require("../utils/response");
 const Comment = require("../models/comment");
-const { findById } = require("../models/user");
 const { Post } = require("../models/post");
 
 const commentRouter = express.Router();
@@ -30,6 +29,22 @@ commentRouter.post("/create/:postId", isTokenValid, async (req, res) => {
 
     } catch (err) {
         return sendResponse(res, 500, false, "Error posting the comment");
+    }
+});
+
+
+commentRouter.get("/view/:postId", isTokenValid, async (req, res) => {
+
+    try {
+        const postId = req.params.postId;
+        const comments = await Comment.find({ post: postId }).populate("author", "name role fieldOfStudy institution");
+        if (comments.length === 0) {
+            return sendResponse(res, 200, "No comments yet", []);
+        }
+        return sendResponse(res, 200, true, "Comments fetched Succesfully", comments)
+
+    } catch (err) {
+        return sendResponse(res, 500, false, "Comments failed to load");
     }
 });
 
