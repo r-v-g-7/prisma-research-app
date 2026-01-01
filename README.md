@@ -12,3 +12,4 @@ TASKS PERFORMED::::
 - apply all the logs and checks to know anytime whether the db is working fine or not
 - Write the password hashing code at the model/schema using pre(`save`) hook
 - Commit 1 just for the sake of New Year
+- Commit 2 just for the sake of New Year
