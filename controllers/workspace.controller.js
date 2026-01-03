@@ -26,3 +26,30 @@ const createWorkspace = async (req, res) => {
         return sendResponse(res, 500, false, "Failed to create the workspace");
     }
 }
+
+
+const joinWorkspace = async (req, res) => {
+
+    try {
+        const userId = req.userId;
+        const workspaceId = req.params.workspaceId;
+
+        const initialWorkspace = await Workspace.findById(workspaceId);
+
+        if (!initialWorkspace) {
+            return sendResponse(res, 404, false, "Workspace not found");
+        }
+
+        if (initialWorkspace.members.some(id => id.toString() === userId)) {
+            return sendResponse(res, 400, false, "You are already in the workspace");
+        }
+
+        await Workspace.findOneAndUpdate({ _id: workspaceId }, { $addToSet: { members: userId } });
+
+        const finalWorkspace = await Workspace.findById(workspaceId);
+
+        return sendResponse(res, 200, true, "Joined the workspace successfully", finalWorkspace);
+    } catch (err) {
+        return sendResponse(res, 500, false, "Failed to join the workspace");
+    }
+}
