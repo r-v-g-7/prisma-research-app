@@ -4,6 +4,7 @@ const { Post } = require("../models/post");
 const sendResponse = require("../utils/response");
 const mongoose = require("mongoose");
 const { commentRouter } = require("./comment.routes");
+const { workspaceRouter } = require("./workspace.routes");
 
 
 const postRouter = express.Router();
@@ -108,5 +109,6 @@ postRouter.delete("/delete/:postId", isTokenValid, async (req, res, next) => {
 
 
 postRouter.use("/:postId/comment", commentRouter);
+postRouter.use("/workspace", workspaceRouter);
 
 module.exports = postRouter; 

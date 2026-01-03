@@ -7,7 +7,10 @@ const createWorkspace = async (req, res) => {
     try {
         const userId = req.userId;
         const postId = req.params.postId;
+        console.log(postId);
+
         const post = await Post.findById(postId);
+
         if (!post) {
             return sendResponse(res, 404, false, "Post not found");
         }
@@ -78,4 +81,4 @@ const workspaceInfo = async (req, res) => {
 }
 
 
-module.exports = { createWorkspace, joinWorkspace }; 
+module.exports = { createWorkspace, joinWorkspace, workspaceInfo }; 
