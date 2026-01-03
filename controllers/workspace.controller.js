@@ -53,3 +53,29 @@ const joinWorkspace = async (req, res) => {
         return sendResponse(res, 500, false, "Failed to join the workspace");
     }
 }
+
+
+
+const workspaceInfo = async (req, res) => {
+
+    try {
+        const userId = req.userId;
+        const workspaceId = req.params.workspaceId;
+        const workspace = await Workspace.findById(workspaceId);
+        if (!workspace) {
+            return sendResponse(res, 404, false, "Workspace is not found");
+        }
+        if (!workspace.members.some(id => id.toString() === userId)) {
+            return sendResponse(res, 403, false, "Access Denied");
+        }
+
+        return sendResponse(res, 200, true, "Workspace info loaded successfully", workspace);
+
+
+    } catch (err) {
+        sendResponse(res, 500, false, "Failed to load workspace info");
+    }
+}
+
+
+module.exports = { createWorkspace, joinWorkspace }; 
