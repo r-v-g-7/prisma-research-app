@@ -11,7 +11,8 @@ authRouter.post("/register", async (req, res, next) => {
         const user = await signUpAuth(req.body);
         sendResponse(res, 201, true, "Registration Successfull", user);
     } catch (err) {
-        res.status(400).send("ERROR: " + err.message)
+        err.statuscode = err.statuscode || 400;
+        return next(err);
     }
 });
 
@@ -20,8 +21,9 @@ authRouter.post("/login", async (req, res, next) => {
         const { email, password } = req.body;
         const user = await loginAuth({ email, password });
         if (!user) {
-            res.status(400).send('Login failed!');
-            return;
+            const err = err;
+            err.statuscode = err.statuscode || 400;
+            return next(err);
         }
         const { _id, role } = user
         const token = jwt.sign({ userId: _id, userRole: role }, process.env.JWT_KEY, { expiresIn: '1y' });
@@ -29,9 +31,10 @@ authRouter.post("/login", async (req, res, next) => {
             httpOnly: true,
             secure: true,
         });
-        sendResponse(res, 201, true, "Login Successfull", user);
+        sendResponse(res, 200, true, "Login Successfull", user);
     } catch (err) {
-        res.status(400).send("ERROR: " + err.message)
+        err.statuscode = err.statuscode || 400;
+        return next(err);
     }
 });
 

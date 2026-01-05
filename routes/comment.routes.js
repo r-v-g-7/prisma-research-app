@@ -13,6 +13,7 @@ commentRouter.post("/create", isTokenValid, async (req, res) => {
         const post = await Post.findById(postId);
         console.log(post);
         if (!post) {
+            const err = new Error("Post not found")
             return sendResponse(res, 404, false, "Post not found")
         }
         const author = req.userId;
