@@ -2,12 +2,11 @@ const { Post } = require("../models/post");
 const Workspace = require("../models/workspace");
 const sendResponse = require("../utils/response");
 
-const createWorkspace = async (req, res) => {
+const createWorkspace = async (req, res, next) => {
 
     try {
         const userId = req.userId;
         const postId = req.params.postId;
-        console.log(postId);
 
         const post = await Post.findById(postId);
 
@@ -19,6 +18,12 @@ const createWorkspace = async (req, res) => {
             return sendResponse(res, 409, false, "Workspace already exists");
         }
         const { name } = req.body;
+
+        if (name === null) {
+            const err = new Error("Workspace name cannot be empty");
+            err.statusCode = 400;
+            return next(err);
+        }
         const workspace = new Workspace({ name, creator: userId, post: postId, members: [userId] });
 
         await workspace.save();
@@ -26,12 +31,11 @@ const createWorkspace = async (req, res) => {
         return sendResponse(res, 201, true, "Workspace created successfully", workspace);
 
     } catch (err) {
-        return sendResponse(res, 500, false, "Failed to create the workspace");
+        next(err);
     }
 }
 
-
-const joinWorkspace = async (req, res) => {
+const joinWorkspace = async (req, res, next) => {
 
     try {
         const userId = req.userId;
@@ -40,11 +44,15 @@ const joinWorkspace = async (req, res) => {
         const initialWorkspace = await Workspace.findById(workspaceId);
 
         if (!initialWorkspace) {
-            return sendResponse(res, 404, false, "Workspace not found");
+            const err = new Error("Workspace not found");
+            err.statusCode = 404;
+            return next(err);
         }
 
         if (initialWorkspace.members.some(id => id.toString() === userId)) {
-            return sendResponse(res, 400, false, "You are already in the workspace");
+            const err = new Error("You are already in the workspace");
+            err.statusCode = 400;
+            return next(err);
         }
 
         await Workspace.findOneAndUpdate({ _id: workspaceId }, { $addToSet: { members: userId } });
@@ -53,30 +61,32 @@ const joinWorkspace = async (req, res) => {
 
         return sendResponse(res, 200, true, "Joined the workspace successfully", finalWorkspace);
     } catch (err) {
-        return sendResponse(res, 500, false, "Failed to join the workspace");
+        next(err);
     }
 }
 
-
-
-const workspaceInfo = async (req, res) => {
+const workspaceInfo = async (req, res, next) => {
 
     try {
         const userId = req.userId;
         const workspaceId = req.params.workspaceId;
         const workspace = await Workspace.findById(workspaceId);
         if (!workspace) {
-            return sendResponse(res, 404, false, "Workspace is not found");
+            const err = new Error("Workspace is not found");
+            err.statusCode = 404;
+            return next(err);
         }
         if (!workspace.members.some(id => id.toString() === userId)) {
-            return sendResponse(res, 403, false, "Access Denied");
+            const err = new Error("Access Denied");
+            err.statusCode = 403;
+            return next(err);
         }
 
         return sendResponse(res, 200, true, "Workspace info loaded successfully", workspace);
 
 
     } catch (err) {
-        sendResponse(res, 500, false, "Failed to load workspace info");
+        next(err);
     }
 }
 

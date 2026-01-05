@@ -15,41 +15,52 @@ profileRouter.get("/show", isTokenValid, async (req, res, next) => {
             return
         }
         const { name, fieldOfStudy, institution, role } = user;
-        sendResponse(res, 201, true, "Profile fetched Successfully", { name, role, fieldOfStudy, institution });
+        sendResponse(res, 200, true, "Profile fetched Successfully", { name, role, fieldOfStudy, institution });
     } catch (err) {
-        sendResponse(res, 400, false, "Something went wrong, User NOT found");
+        next(err);
     }
-})
+});
+
 
 profileRouter.patch("/update", isTokenValid, async (req, res, next) => {
-
     try {
         const allowedFields = ["name", "fieldOfStudy", "institution"];
-        const toUpdateObject = req.body;
-        const toUpdateKeys = Object.keys(toUpdateObject);
+        const updateKeys = Object.keys(req.body);
 
-        const isValidToUpdate = toUpdateKeys.every((key) =>
+        if (updateKeys.length === 0) {
+            const err = new Error("No fields provided to update");
+            err.statusCode = 400;
+            return next(err);
+        }
+
+        const isValidToUpdate = updateKeys.every(key =>
             allowedFields.includes(key)
         );
 
         if (!isValidToUpdate) {
-            const err = new Error("Respective value cannot be changed");
-            err.statusCode = 401;
+            const err = new Error("Invalid field(s) in update request");
+            err.statusCode = 400;
             return next(err);
         }
+
         const user = await useFindUserByUserId(req.userId);
+
         if (!user) {
-            sendResponse(res, 401, false, "User NOT found, kindly login again");
-            return
+            const err = new Error("User not found");
+            err.statusCode = 404;
+            return next(err);
         }
 
-        toUpdateKeys.forEach((key) =>
-            user[key] = req.body[key]
-        )
+        updateKeys.forEach(key => {
+            user[key] = req.body[key];
+        });
 
         await user.save();
 
-        sendResponse(res, 200, true, "User Updated Succesfully", user);
+        const { name, fieldOfStudy, institution } = user;
+
+        return sendResponse(res, 200, true, "Profile updated successfully", { name, fieldOfStudy, institution }
+        );
 
     } catch (err) {
         next(err);
