@@ -33,8 +33,9 @@ profileRouter.patch("/update", isTokenValid, async (req, res, next) => {
         );
 
         if (!isValidToUpdate) {
-            sendResponse(res, 401, false, "Respective value cannot be changed")
-            return;
+            const err = new Error("Respective value cannot be changed");
+            err.statusCode = 401;
+            return next(err);
         }
         const user = await useFindUserByUserId(req.userId);
         if (!user) {
@@ -51,7 +52,7 @@ profileRouter.patch("/update", isTokenValid, async (req, res, next) => {
         sendResponse(res, 200, true, "User Updated Succesfully", user);
 
     } catch (err) {
-        sendResponse(res, 400, false, "Something went wrong")
+        next(err);
     }
 });
 

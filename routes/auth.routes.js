@@ -11,8 +11,7 @@ authRouter.post("/register", async (req, res, next) => {
         const user = await signUpAuth(req.body);
         sendResponse(res, 201, true, "Registration Successfull", user);
     } catch (err) {
-        err.statuscode = err.statuscode || 400;
-        return next(err);
+        next(err);
     }
 });
 
@@ -21,11 +20,11 @@ authRouter.post("/login", async (req, res, next) => {
         const { email, password } = req.body;
         const user = await loginAuth({ email, password });
         if (!user) {
-            const err = err;
-            err.statuscode = err.statuscode || 400;
+            const err = new Error("Wrong email or password");
+            err.statusCode = 401;
             return next(err);
         }
-        const { _id, role } = user
+        const { _id, role } = user;
         const token = jwt.sign({ userId: _id, userRole: role }, process.env.JWT_KEY, { expiresIn: '1y' });
         res.cookie("token", token, {
             httpOnly: true,
@@ -33,12 +32,12 @@ authRouter.post("/login", async (req, res, next) => {
         });
         sendResponse(res, 200, true, "Login Successfull", user);
     } catch (err) {
-        err.statuscode = err.statuscode || 400;
-        return next(err);
+        next(err);
     }
 });
 
 authRouter.post("/me", isTokenValid, (req, res, next) => {
     res.send("Yes the token is valid")
-})
+});
+
 module.exports = authRouter;

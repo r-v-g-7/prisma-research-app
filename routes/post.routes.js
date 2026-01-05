@@ -19,12 +19,16 @@ postRouter.patch("/update/:postId", isTokenValid, async (req, res, next) => {
             allowedFields.includes(key)
         );
         if (!isValidToUpdate) {
-            return sendResponse(res, 400, false, "Failed to update respective values");
+            const err = new Error("Failed to updated respective values");
+            err.statusCode = 400;
+            return next(err);
         }
         const postId = req.params.postId;
         const { title, content, tags } = req.body;
         if (!title && !content && !tags) {
-            return sendResponse(res, 400, false, "No changes made");
+            const err = new Error("No changes made");
+            err.statusCode = 400;
+            return next(err);
         }
 
         const userId = req.userId;
@@ -32,12 +36,14 @@ postRouter.patch("/update/:postId", isTokenValid, async (req, res, next) => {
 
         const post = await Post.findOneAndUpdate({ _id: postId, author: author }, req.body, { new: true });
         if (!post) {
-            return sendResponse(res, 404, false, "Post Does NOT exist");
+            const err = new Error("Post does not exist");
+            err.statusCode = 404;
+            return next(err);
         }
-        return sendResponse(res, 200, true, "Post Updated Succesfully");
+        return sendResponse(res, 200, true, "Post Updated Succesfully", post);
 
     } catch (err) {
-        return sendResponse(res, 500, false, "Failed to update the post");
+        next(err);
     }
 });
 
@@ -47,14 +53,16 @@ postRouter.post("/create", isTokenValid, async (req, res, next) => {
         const { title, content, tags } = req.body;
         const author = req.userId;
         if (!title || !content) {
-            return sendResponse(res, 400, false, "Respective fields cannot be empty")
+            const err = new Error("Respective fields cannot be empty");
+            err.statusCode = 400;
+            return next(err);
         }
         const post = new Post({ title, content, author, tags });
         await post.save()
         sendResponse(res, 201, true, "Posted Succesfully", post);
 
     } catch (err) {
-        sendResponse(res, 500, false, "Post failed")
+        next(err);
     }
 });
 
@@ -67,7 +75,7 @@ postRouter.get("/feed", async (req, res, next) => {
 
         return sendResponse(res, 200, true, "Feed loaded Successfully", posts);
     } catch (err) {
-        return sendResponse(res, 500, false, "Failed to load feed");
+        next(err);
     }
 });
 
@@ -76,16 +84,20 @@ postRouter.get("/view/:postId", async (req, res, next) => {
     try {
         const postId = req.params.postId;
         if (!mongoose.Types.ObjectId.isValid(postId)) {
-            return sendResponse(res, 400, false, "Invalid post ID");
+            const err = new Error("Invalid post ID");
+            err.statusCode = 400;
+            return next(err);
         }
         const post = await Post.findById(postId).populate("author", "name role fieldOfStudy institution");
         if (!post) {
-            return sendResponse(res, 404, false, "Post does not exist");
+            const err = new Error("Post does not exist");
+            err.statusCode = 404;
+            return next(err);
         }
         return sendResponse(res, 200, true, "Post Loaded Succesfully", post);
 
     } catch (err) {
-        return sendResponse(res, 500, false, "Failed to load the post");
+        next(err);
     }
 });
 
@@ -94,16 +106,20 @@ postRouter.delete("/delete/:postId", isTokenValid, async (req, res, next) => {
     try {
         const postId = req.params.postId;
         if (!mongoose.Types.ObjectId.isValid(postId)) {
-            return sendResponse(res, 400, false, "Invalid post ID");
+            const err = new Error("Invalid post ID");
+            err.statusCode = 400;
+            return next(err);
         }
         const author = req.userId
         const post = await Post.findOneAndDelete({ author: author, _id: postId });
         if (!post) {
-            return sendResponse(res, 404, false, "Post not found or you are not authorized");
+            const err = new Error("Post not found or user not authorized");
+            err.statusCode = 404;
+            return next(err);
         }
-        return sendResponse(res, 200, true, "Post Deleted Successfully");
+        return sendResponse(res, 204, true, "Post Deleted Successfully");
     } catch (err) {
-        return sendResponse(res, 500, false, "Failed to delete post");
+        next(err);
     }
 });
 
