@@ -2,6 +2,11 @@ const bcrypt = require("bcrypt")
 const User = require("../models/user")
 
 const signUpAuth = async ({ name, email, password, role, fieldOfStudy, institution }) => {
+    if (!name || !email || !password || !role || !fieldOfStudy) {
+        const err = new Error("All fields are required");
+        err.statusCode = 400;
+        throw err;
+    }
     const user = new User({ name, email, password, role, fieldOfStudy, institution });
     try {
         await user.save()
@@ -13,6 +18,11 @@ const signUpAuth = async ({ name, email, password, role, fieldOfStudy, instituti
 };
 
 const loginAuth = async ({ email, password }) => {
+    if (!email || !password) {
+        const err = new Error("All fields are required");
+        err.statusCode = 400;
+        throw err;
+    }
     try {
         const user = await User.findOne({ email: email }).select("+password");
         if (!user) {

@@ -74,11 +74,11 @@ const viewPost = async (req, res, next) => {
 
     try {
         const postId = req.params.postId;
-        // if (!mongoose.Types.ObjectId.isValid(postId)) {
-        //     const err = new Error("Invalid post ID");
-        //     err.statusCode = 400;
-        //     return next(err);
-        // }
+        if (!mongoose.Types.ObjectId.isValid(postId)) {
+            const err = new Error("Invalid post ID");
+            err.statusCode = 400;
+            return next(err);
+        }
         const post = await Post.findById(postId).populate("author", "name role fieldOfStudy institution");
         if (!post) {
             const err = new Error("Post does not exist");
@@ -108,7 +108,7 @@ const deletePost = async (req, res, next) => {
             err.statusCode = 404;
             return next(err);
         }
-        return sendResponse(res, 204, true, "Post Deleted Successfully");
+        return sendResponse(res, 200, true, "Post Deleted Successfully");
     } catch (err) {
         next(err);
     }

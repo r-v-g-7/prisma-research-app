@@ -18,8 +18,7 @@ const createWorkspace = async (req, res, next) => {
             return sendResponse(res, 409, false, "Workspace already exists");
         }
         const { name } = req.body;
-
-        if (name === null) {
+        if (name.trim() === "") {
             const err = new Error("Workspace name cannot be empty");
             err.statusCode = 400;
             return next(err);
