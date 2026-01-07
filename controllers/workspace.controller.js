@@ -1,12 +1,18 @@
 const { Post } = require("../models/post");
 const Workspace = require("../models/workspace");
 const sendResponse = require("../utils/response");
+const mongoose = require("mongoose");
 
 const createWorkspace = async (req, res, next) => {
 
     try {
         const userId = req.userId;
         const postId = req.params.postId;
+        if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(postId)) {
+            const err = new Error("Invalid post or user")
+            err.statusCode = 400;
+            throw err;
+        }
 
         const post = await Post.findById(postId);
 
@@ -18,7 +24,7 @@ const createWorkspace = async (req, res, next) => {
             return sendResponse(res, 409, false, "Workspace already exists");
         }
         const { name } = req.body;
-        if (name.trim() === "") {
+        if (!name || name.trim() === "") {
             const err = new Error("Workspace name cannot be empty");
             err.statusCode = 400;
             return next(err);
@@ -39,6 +45,12 @@ const joinWorkspace = async (req, res, next) => {
     try {
         const userId = req.userId;
         const workspaceId = req.params.workspaceId;
+
+        if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(workspaceId)) {
+            const err = new Error("Invalid user or workspace")
+            err.statusCode = 400;
+            throw err;
+        }
 
         const initialWorkspace = await Workspace.findById(workspaceId);
 
@@ -69,6 +81,11 @@ const workspaceInfo = async (req, res, next) => {
     try {
         const userId = req.userId;
         const workspaceId = req.params.workspaceId;
+        if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(workspaceId)) {
+            const err = new Error("Invalid user or workspace")
+            err.statusCode = 400;
+            throw err;
+        }
         const workspace = await Workspace.findById(workspaceId);
         if (!workspace) {
             const err = new Error("Workspace is not found");
