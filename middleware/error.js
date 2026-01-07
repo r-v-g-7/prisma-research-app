@@ -6,18 +6,18 @@ const errorHandler = (error, req, res, next) => {
     const message = error.message || "Internal server error";
 
     if (error.name === "ValidationError") {
-        sendResponse(res, 400, false, message);
+        return sendResponse(res, 400, false, message);
     }
     else if (error.name === "CastError") {
-        sendResponse(res, 400, false, "Invalid ID format");
+        return sendResponse(res, 400, false, "Invalid ID format");
     }
     else if (error.name === "JsonWebTokenError") {
-        sendResponse(res, 401, false, "Invalid token");
+        return sendResponse(res, 401, false, "Invalid token");
     }
     else if (error.name === "TokenExpiredError") {
-        sendResponse(res, 401, false, "Token expired");
+        return sendResponse(res, 401, false, "Token expired");
     }
-    else sendResponse(res, statusCode, false, message);
+    else return sendResponse(res, statusCode, false, message);
 
 }
 
