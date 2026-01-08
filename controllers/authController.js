@@ -19,14 +19,16 @@ const signUpAuth = async ({ name, email, password, role, fieldOfStudy, instituti
 
 const loginAuth = async ({ email, password }) => {
     if (!email || !password) {
-        const err = new Error("All fields are required");
+        const err = new Error("Email or Password cannot be empty");
         err.statusCode = 400;
         throw err;
     }
     try {
         const user = await User.findOne({ email: email }).select("+password");
         if (!user) {
-            throw new Error("Error 404 User NOT FOUND");
+            const err = new Error("User NOT found");
+            err.statusCode = 404;
+            throw err;
         }
         const hashPassword = user.password;
         const isPasswordValid = await bcrypt.compare(password, hashPassword);

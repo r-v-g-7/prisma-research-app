@@ -17,7 +17,9 @@ const createWorkspace = async (req, res, next) => {
         const post = await Post.findById(postId);
 
         if (!post) {
-            return sendResponse(res, 404, false, "Post not found");
+            const err = new Error("Post not found");
+            err.statusCode = 404;
+            return next(err)
         }
         const existingWorkspace = await Workspace.findOne({ post: postId });
         if (existingWorkspace) {
@@ -81,11 +83,13 @@ const workspaceInfo = async (req, res, next) => {
     try {
         const userId = req.userId;
         const workspaceId = req.params.workspaceId;
+
         if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(workspaceId)) {
             const err = new Error("Invalid user or workspace")
             err.statusCode = 400;
             throw err;
         }
+
         const workspace = await Workspace.findById(workspaceId);
         if (!workspace) {
             const err = new Error("Workspace is not found");

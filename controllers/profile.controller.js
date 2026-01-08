@@ -1,10 +1,10 @@
-const useFindUserByUserId = require("../utils/useFindUserWithUserId");
 const sendResponse = require("../utils/response");
+const User = require("../models/user");
 
 
 const showProfile = async (req, res, next) => {
     try {
-        const user = await useFindUserByUserId(req.userId)
+        const user = await User.findById(req.userId)
         if (!user) {
             sendResponse(res, 401, false, "User NOT found, kindly login again");
             return
@@ -37,7 +37,7 @@ const updateProfile = async (req, res, next) => {
             return next(err);
         }
 
-        const user = await useFindUserByUserId(req.userId);
+        const user = await User.findById(req.userId);
 
         if (!user) {
             const err = new Error("User not found");
