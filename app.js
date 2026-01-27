@@ -7,11 +7,16 @@ const authRouter = require("./routes/auth.routes.js")
 const profileRouter = require("./routes/profile.routes.js")
 const postRouter = require("./routes/post.routes.js")
 const { errorHandler } = require("./middleware/error.js")
+const cors = require("cors");
 
 const app = express()
 
 app.use(express.json())
 app.use(cookieParser())
+app.use(cors({
+    origin: "http://localhost:5173", // frontend port
+    credentials: true
+}));
 
 app.use("/", healthRouter)
 app.use("/auth", authRouter)
@@ -31,4 +36,4 @@ async function connectAndListen() {
     }
 }
 
-connectAndListen()
+connectAndListen();

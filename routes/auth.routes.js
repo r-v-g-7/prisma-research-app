@@ -7,9 +7,11 @@ const { isTokenValid } = require("../middleware/auth.js")
 const authRouter = express.Router();
 
 authRouter.post("/register", async (req, res, next) => {
+
     try {
         const user = await signUpAuth(req.body);
         sendResponse(res, 201, true, "Registration Successfull", user);
+
     } catch (err) {
         next(err);
     }
@@ -28,8 +30,9 @@ authRouter.post("/login", async (req, res, next) => {
         const token = jwt.sign({ userId: _id, userRole: role }, process.env.JWT_KEY, { expiresIn: '1y' });
         res.cookie("token", token, {
             httpOnly: true,
-            secure: true,
+            secure: false,
         });
+        console.log("User Login successfully", user);
         sendResponse(res, 200, true, "Login Successfull", user);
     } catch (err) {
         next(err);
