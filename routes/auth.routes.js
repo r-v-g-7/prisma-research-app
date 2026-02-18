@@ -33,7 +33,7 @@ authRouter.post("/login", async (req, res, next) => {
             secure: false,
         });
         console.log("User Login successfully", user);
-        sendResponse(res, 200, true, "Login Successfull", user);
+        sendResponse(res, 200, true, "Login Successfull", { user, token });
     } catch (err) {
         next(err);
     }

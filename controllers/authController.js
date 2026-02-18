@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt")
 const User = require("../models/user")
+const jwt = require("jsonwebtoken");
 
 const signUpAuth = async ({ name, email, password, role, fieldOfStudy, institution }) => {
     if (!name || !email || !password || !role || !fieldOfStudy) {

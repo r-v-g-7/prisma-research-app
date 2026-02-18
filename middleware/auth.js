@@ -3,11 +3,19 @@ const sendResponse = require("../utils/response");
 
 const isTokenValid = (req, res, next) => {
     try {
-        const { token } = req.cookies;
+        let token = req.cookies.token;
         if (!token) {
-            sendResponse(res, 401, false, "Token not found")
-            return
+            const authHeader = req.headers.authorization;
+            if (authHeader && authHeader.startsWith('Bearer ')) {
+                token = authHeader.split(' ')[1];
+            }
         }
+
+        if (!token) {
+            sendResponse(res, 401, false, "Token not found");
+            return;
+        }
+
         const decoded = jwt.verify(token, process.env.JWT_KEY)
         const { userId, role } = decoded;
         req.userId = userId;
