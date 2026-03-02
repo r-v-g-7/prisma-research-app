@@ -6,7 +6,7 @@ const isTokenValid = (req, res, next) => {
         let token = req.cookies.token;
         if (!token) {
             const authHeader = req.headers.authorization;
-            if (authHeader && authHeader.startsWith('Bearer ')) {
+            if (authHeader && authHeader.startsWith('Bearer')) {
                 token = authHeader.split(' ')[1];
             }
         }

@@ -16,6 +16,11 @@ const postSchema = new mongoose.Schema({
     },
     tags: {
         type: [String]
+    },
+    type: {
+        type: String,
+        enum: ['research', 'question', 'announcement', 'study'],
+        required: true
     }
 }, { timestamps: true })
 

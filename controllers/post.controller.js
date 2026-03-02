@@ -41,14 +41,14 @@ const updatePost = async (req, res, next) => {
 const createPost = async (req, res, next) => {
 
     try {
-        const { title, content, tags } = req.body;
+        const { title, content, tags, type } = req.body;
         const author = req.userId;
-        if (!title || !content) {
+        if (!title || !content || !type) {
             const err = new Error("Respective fields cannot be empty");
             err.statusCode = 400;
             return next(err);
         }
-        const post = new Post({ title, content, author, tags });
+        const post = new Post({ title, content, author, tags, type });
         await post.save()
         sendResponse(res, 201, true, "Posted Succesfully", post);
 
