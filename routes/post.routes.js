@@ -14,6 +14,6 @@ postRouter.get("/view/:postId", viewPost);
 postRouter.delete("/delete/:postId", isTokenValid, deletePost);
 
 postRouter.use("/:postId/comment", commentRouter);
-postRouter.use("/workspace", workspaceRouter);
+postRouter.use("/:postId/workspace", workspaceRouter);
 
 module.exports = postRouter;

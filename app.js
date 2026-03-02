@@ -8,6 +8,7 @@ const profileRouter = require("./routes/profile.routes.js")
 const postRouter = require("./routes/post.routes.js")
 const { errorHandler } = require("./middleware/error.js")
 const cors = require("cors");
+const { workspaceRouter } = require("./routes/workspace.routes.js")
 
 const app = express()
 
@@ -18,11 +19,12 @@ app.use(cors({
     credentials: true
 }));
 
-app.use("/", healthRouter)
-app.use("/auth", authRouter)
-app.use("/profile", profileRouter)
-app.use("/post", postRouter)
-app.use(errorHandler)
+app.use("/", healthRouter);
+app.use("/auth", authRouter);
+app.use("/profile", profileRouter);
+app.use("/post", postRouter);
+app.use("/workspace", workspaceRouter);
+app.use(errorHandler);
 
 
 async function connectAndListen() {

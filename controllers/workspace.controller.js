@@ -110,5 +110,18 @@ const workspaceInfo = async (req, res, next) => {
     }
 }
 
+const getAllWorkspaces = async (req, res, next) => {
+    try {
+        const workspaces = await Workspace.find()
+            .populate('creator', 'name role')
+            .sort({ createdAt: -1 });
 
-module.exports = { createWorkspace, joinWorkspace, workspaceInfo }; 
+        sendResponse(res, 200, true, "Workspaces loaded", workspaces);
+
+    } catch (err) {
+        next(err);
+    }
+}
+
+
+module.exports = { createWorkspace, joinWorkspace, workspaceInfo, getAllWorkspaces }; 
