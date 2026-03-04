@@ -1,15 +1,32 @@
 const mongoose = require('mongoose');
 
 const workspaceSchema = new mongoose.Schema({
-    name: {
+    title: {
         type: String,
         required: true
     },
-    post: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Post",
+    description: {
+        type: String,
         required: true
     },
+    type: {
+        type: String,
+        enum: ["research", "study", "lab"],
+        required: true
+    },
+    privacy: {
+        type: String,
+        enum: ["public", "private"],
+        required: true
+    },
+    tags: [{
+        type: String
+    }],
+    // post: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "Post",
+    //     required: true
+    // },
     creator: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",

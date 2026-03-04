@@ -4,12 +4,11 @@ const { createWorkspace, joinWorkspace, workspaceInfo, getAllWorkspaces } = requ
 
 const workspaceRouter = express.Router({ mergeParams: true });
 
-workspaceRouter.post("/:postId/create", isTokenValid, createWorkspace);
+workspaceRouter.post("/create", isTokenValid, createWorkspace); // "/:postId/create" this was the actuall path, for now it have been modified as we have no post yet
 
 workspaceRouter.post("/join/:workspaceId", isTokenValid, joinWorkspace);
 
 workspaceRouter.get("/info/:workspaceId", isTokenValid, workspaceInfo);
 
-workspaceRouter.get("/all", isTokenValid, getAllWorkspaces);
 
 module.exports = { workspaceRouter }; 

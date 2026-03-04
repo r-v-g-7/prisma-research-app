@@ -7,31 +7,50 @@ const createWorkspace = async (req, res, next) => {
 
     try {
         const userId = req.userId;
-        const postId = req.params.postId;
-        if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(postId)) {
-            const err = new Error("Invalid post or user")
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            const err = new Error("Invalid user")
             err.statusCode = 400;
             throw err;
         }
 
-        const post = await Post.findById(postId);
+        const { title, description, type, privacy, tags } = req.body;
 
-        if (!post) {
-            const err = new Error("Post not found");
-            err.statusCode = 404;
-            return next(err)
-        }
-        const existingWorkspace = await Workspace.findOne({ post: postId });
-        if (existingWorkspace) {
-            return sendResponse(res, 409, false, "Workspace already exists");
-        }
-        const { name } = req.body;
-        if (!name || name.trim() === "") {
-            const err = new Error("Workspace name cannot be empty");
+        if (!title || title.trim() === "") {
+            const err = new Error("Workspace title cannot be empty");
             err.statusCode = 400;
             return next(err);
         }
-        const workspace = new Workspace({ name, creator: userId, post: postId, members: [userId] });
+
+        // const postId = req.params.postId;
+        // if (!mongoose.Types.ObjectId.isValid(postId)) {
+        //     const err = new Error("Invalid post")
+        //     err.statusCode = 400;
+        //     throw err;
+        // }
+
+        // const post = await Post.findById(postId);
+        // if (!post) {
+        //     const err = new Error("Post not found");
+        //     err.statusCode = 404;
+        //     return next(err)
+        // }
+
+        // const existingWorkspace = await Workspace.findOne({ post: postId });
+        // if (existingWorkspace) {
+        //     return sendResponse(res, 409, false, "Workspace already exists");
+        // }
+
+        const workspace = new Workspace({
+            title,
+            description,
+            type,
+            privacy,
+            tags,
+            creator: userId,
+            // post: postId, 
+            members: [userId]
+        });
 
         await workspace.save();
 
