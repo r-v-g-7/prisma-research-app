@@ -115,6 +115,11 @@ const workspaceInfo = async (req, res, next) => {
             err.statusCode = 404;
             return next(err);
         }
+
+        console.log("req.userId:", userId);
+        console.log("workspace.members:", workspace.members);
+        console.log("workspace.creator:", workspace.creator);
+
         if (!workspace.members.some(id => id.toString() === userId)) {
             const err = new Error("Access Denied");
             err.statusCode = 403;
@@ -142,5 +147,37 @@ const getAllWorkspaces = async (req, res, next) => {
     }
 }
 
+const viewWorkspace = async (req, res, next) => {
+    try {
+        const workspaceId = req.params.workspaceId;
 
-module.exports = { createWorkspace, joinWorkspace, workspaceInfo, getAllWorkspaces }; 
+        if (!mongoose.Types.ObjectId.isValid(workspaceId)) {
+            const err = new Error("Invalid workspace ID");
+            err.statusCode = 400;
+            return next(err);
+        }
+
+        const workspace = await Workspace.findById(workspaceId)
+        .populate('creator', 'name role')   
+        .populate('members', 'name role');
+
+        if (!workspace) {
+            const err = new Error("Workspace not found");
+            err.statusCode = 404;
+            return next(err);
+        }
+
+        return sendResponse(
+            res,
+            200,
+            true,
+            "Workspace details loaded successfully",
+            workspace
+        );
+
+    } catch (err) {
+        next(err);
+    }
+};
+
+module.exports = { createWorkspace, joinWorkspace, workspaceInfo, getAllWorkspaces, viewWorkspace }; 

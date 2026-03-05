@@ -6,7 +6,7 @@ const isTokenValid = (req, res, next) => {
         let token = req.cookies.token;
         if (!token) {
             const authHeader = req.headers.authorization;
-            if (authHeader && authHeader.startsWith('Bearer')) {
+            if (authHeader && authHeader.startsWith('Bearer ')) {
                 token = authHeader.split(' ')[1];
             }
         }
@@ -17,9 +17,9 @@ const isTokenValid = (req, res, next) => {
         }
 
         const decoded = jwt.verify(token, process.env.JWT_KEY)
-        const { userId, role } = decoded;
+        const { userId, userRole } = decoded;
         req.userId = userId;
-        req.role = role;
+        req.role = userRole;
         next();
 
     } catch (err) {
