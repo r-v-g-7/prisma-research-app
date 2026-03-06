@@ -68,7 +68,7 @@ const joinWorkspace = async (req, res, next) => {
         const workspaceId = req.params.workspaceId;
 
         if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(workspaceId)) {
-            const err = new Error("Invalid user or workspace")
+            const err = new Error("Invalid user or workspace ID")
             err.statusCode = 400;
             throw err;
         }
@@ -95,6 +95,44 @@ const joinWorkspace = async (req, res, next) => {
     } catch (err) {
         next(err);
     }
+}
+
+
+const leaveWorkspace = async (req, res, next) => {
+
+    try {
+        const userId = req.userId; 
+        const workspaceId = req.params.workspaceId; 
+
+        if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(workspaceId)) {
+            const err = new Error("Invalid user or workspace")
+            err.statusCode = 400;
+            throw err;
+        }
+
+        const initialWorkspace = await Workspace.findById(workspaceId);
+        if (!initialWorkspace) {
+            const err = new Error("Workspace not found");
+            err.statusCode = 404;
+            return next(err);
+        }
+
+        if (!initialWorkspace.members.some(id => id.toString() === userId)) {
+            const err = new Error("You are not the member of this workspace");
+            err.statusCode = 400;
+            return next(err);
+        }
+
+        await Workspace.findOneAndUpdate({ _id: workspaceId }, { $pull: { members: userId } });
+
+        const finalWorkspace = await Workspace.findById(workspaceId);
+        return sendResponse(res, 200, true, "Left the workspace successfully", finalWorkspace);
+
+    } catch(err) {
+        next(err); 
+    }
+
+
 }
 
 const workspaceInfo = async (req, res, next) => {
@@ -180,4 +218,4 @@ const viewWorkspace = async (req, res, next) => {
     }
 };
 
-module.exports = { createWorkspace, joinWorkspace, workspaceInfo, getAllWorkspaces, viewWorkspace }; 
+module.exports = { createWorkspace, joinWorkspace, workspaceInfo, getAllWorkspaces, viewWorkspace, leaveWorkspace }; 
