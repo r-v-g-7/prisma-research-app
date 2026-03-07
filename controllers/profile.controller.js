@@ -4,21 +4,32 @@ const User = require("../models/user");
 
 const showProfile = async (req, res, next) => {
     try {
-        const user = await User.findById(req.userId)
+        const user = await User.findById(req.userId);
+
         if (!user) {
-            sendResponse(res, 401, false, "User NOT found, kindly login again");
-            return
+            return sendResponse(res, 401, false, "User NOT found, kindly login again");
         }
-        const { name, fieldOfStudy, institution, role } = user;
-        sendResponse(res, 200, true, "Profile fetched Successfully", { name, role, fieldOfStudy, institution });
+
+        const { name, fieldOfStudy, institution, role, bio, email } = user;
+
+        return sendResponse(
+            res,
+            200,
+            true,
+            "Profile fetched Successfully",
+            { name, email, role, fieldOfStudy, institution, bio }
+        );
+
     } catch (err) {
         next(err);
     }
-}
+};
+
 
 const updateProfile = async (req, res, next) => {
     try {
-        const allowedFields = ["name", "fieldOfStudy", "institution"];
+        const allowedFields = ["name", "fieldOfStudy", "institution", "bio"];
+
         const updateKeys = Object.keys(req.body);
 
         if (updateKeys.length === 0) {
@@ -51,14 +62,20 @@ const updateProfile = async (req, res, next) => {
 
         await user.save();
 
-        const { name, fieldOfStudy, institution } = user;
+        const { name, fieldOfStudy, institution, bio, role, email } = user;
 
-        return sendResponse(res, 200, true, "Profile updated successfully", { name, fieldOfStudy, institution }
+        return sendResponse(
+            res,
+            200,
+            true,
+            "Profile updated successfully",
+            { name, email, role, fieldOfStudy, institution, bio }
         );
 
     } catch (err) {
         next(err);
     }
-}
+};
 
-module.exports = { showProfile, updateProfile }; 
+
+module.exports = { showProfile, updateProfile };
