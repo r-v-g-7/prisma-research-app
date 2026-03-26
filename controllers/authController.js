@@ -4,16 +4,29 @@ const jwt = require("jsonwebtoken");
 
 const signUpAuth = async ({ name, email, password, role, fieldOfStudy, institution }) => {
     if (!name || !email || !password || !role || !fieldOfStudy) {
-        const err = new Error("All fields are required");
+        const err = new Error("Missing required fields");
         err.statusCode = 400;
         throw err;
     }
-    const user = new User({ name, email, password, role, fieldOfStudy, institution });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = new User({
+        name,
+        email,
+        password: hashedPassword,
+        role,
+        fieldOfStudy,
+        institution
+    });
     try {
-        await user.save()
-        return user
+        console.log("Incoming signup data:", { name, email, password, role, fieldOfStudy, institution });
+        await user.save();
+        return user;
     } catch (err) {
-        console.error("Something went wrong in signing up the user");
+        if (err.code === 11000) {
+            const error = new Error("Email already exists");
+            error.statusCode = 400;
+            throw error;
+        }
         throw err;
     }
 };
