@@ -1,64 +1,102 @@
-import User from "../models/user";
-import { Post } from "../models/post";
-import Workspace from "../models/workspace";
+const User = require("../models/user");
+const { Post } = require("../models/post");
+const Workspace = require("../models/workspace");
 
-export const search = async (req, res, next) => {
+const search = async (req, res, next) => {
     try {
-        const { q, type, entity } = req.query;
+        const { q, type, entity } = req.query;   // ✅ THIS LINE IS REQUIRED
 
-        // 1. Validate query
         if (!q || q.trim() === "") {
             const err = new Error("Search query is required");
             err.statusCode = 400;
             throw err;
         }
-
         const regex = new RegExp(q, "i");
 
-        // 2. Prepare result containers
         let users = [];
         let workspaces = [];
         let posts = [];
 
-        // 3. ENTITY-BASED SEARCH (important)
         if (entity === "users") {
             users = await User.find({
-                $or: [{ name: regex }, { email: regex }],
-            }).select("name email _id");
+                $or: [
+                    { name: regex },
+                    { email: regex },
+                    { fieldOfStudy: regex },
+                    { institution: regex }
+                ],
+            })
+                .select("name email fieldOfStudy institution _id")
+                .limit(10);
 
         } else if (entity === "workspaces") {
-            workspaces = await Workspace.find({
-                $or: [{ name: regex }, { description: regex }],
-            }).select("name description _id");
+            workspaces = Workspace.find({
+                $or: [
+                    { title: regex },
+                    { description: regex },
+                    { tags: regex }
+                ],
+            })
+                .select("title description tags creator _id")
+                .populate("creator", "name")
+                .limit(10);
 
         } else if (entity === "posts") {
-            posts = await Post.find({
-                content: regex,
+            console.log("Searching for:", q);
+            posts = Post.find({
+                $or: [
+                    { title: regex },
+                    { content: regex },
+                    { tags: { $in: [regex] } }   // ✅ FIXED
+                ],
                 ...(type ? { type } : {}),
             })
-                .select("content type author workspace _id")
+                .select("title content type author _id")
                 .populate("author", "name")
-                .populate("workspace", "name");
+                .limit(10)
+                .sort({ createdAt: -1 });
+            console.log("Posts found:", posts.length);
 
         } else {
-            // 🔥 DEFAULT: search EVERYTHING (parallel)
+            console.log("Searching for:", q);
+            // 🔥 GLOBAL SEARCH (parallel)
             [users, workspaces, posts] = await Promise.all([
                 User.find({
-                    $or: [{ name: regex }, { email: regex }],
-                }).select("name email _id"),
+                    $or: [
+                        { name: regex },
+                        { email: regex },
+                        { fieldOfStudy: regex },
+                        { institution: regex }
+                    ],
+                })
+                    .select("name email fieldOfStudy institution _id")
+                    .limit(5),
 
                 Workspace.find({
-                    $or: [{ name: regex }, { description: regex }],
-                }).select("name description _id"),
+                    $or: [
+                        { title: regex },
+                        { description: regex },
+                        { tags: regex }
+                    ],
+                })
+                    .select("title description _id")
+                    .limit(5),
+
 
                 Post.find({
-                    content: regex,
+                    $or: [
+                        { title: regex },
+                        { content: regex },
+                        { tags: { $in: [regex] } }   // ✅ FIXED
+                    ],
                     ...(type ? { type } : {}),
                 })
-                    .select("content type author workspace _id")
+                    .select("title content type author _id")
                     .populate("author", "name")
-                    .populate("workspace", "name"),
+                    .limit(5)
+                    .sort({ createdAt: -1 }),
             ]);
+            console.log("Posts found:", posts.length);
         }
 
         // 4. Send response
@@ -74,3 +112,5 @@ export const search = async (req, res, next) => {
         next(err);
     }
 };
+
+module.exports = search; 

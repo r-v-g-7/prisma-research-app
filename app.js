@@ -9,7 +9,7 @@ const postRouter = require("./routes/post.routes.js")
 const { errorHandler } = require("./middleware/error.js")
 const cors = require("cors");
 const { workspaceRouter } = require("./routes/workspace.routes.js")
-
+const searchRouter = require("./routes/search.routes.js")
 const app = express()
 
 app.use(express.json())
@@ -27,6 +27,7 @@ app.use("/auth", authRouter);
 app.use("/profile", profileRouter);
 app.use("/post", postRouter);
 app.use("/workspace", workspaceRouter);
+app.use("/api/search", searchRouter); 
 app.use(errorHandler);
 
 
